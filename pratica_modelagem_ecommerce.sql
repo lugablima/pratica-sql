@@ -1,0 +1,64 @@
+CREATE DATABASE ecommerce;
+
+CREATE TABLE users (	
+	id SERIAL NOT NULL PRIMARY KEY,
+	name TEXT NOT NULL,
+	email TEXT NOT NULL UNIQUE,
+	password TEXT NOT NULL
+);
+
+CREATE TABLE photos (
+	id SERIAL NOT NULL PRIMARY KEY,
+	url TEXT NOT NULL UNIQUE
+);
+
+CREATE TABLE categories (
+	id SERIAL NOT NULL PRIMARY KEY,
+	name TEXT NOT NULL UNIQUE
+);
+
+CREATE TABLE sizes (
+	id SERIAL NOT NULL PRIMARY KEY,
+	name TEXT NOT NULL UNIQUE,
+);
+
+CREATE TABLE products (
+	id SERIAL NOT NULL PRIMARY KEY,
+	name TEXT NOT NULL UNIQUE,
+	price INTEGER NOT NULL,
+	"mainPhotoId" INTEGER NOT NULL UNIQUE REFERENCES photos(id),
+	"photosId" tsvector NOT NULL UNIQUE REFERENCES photos(id),
+	"categoryId" INTEGER NOT NULL REFERENCES categories(id),
+	"sizesId" tsvector NOT NULL REFERENCES sizes(id)
+);
+
+CREATE TABLE states (
+	id SERIAL NOT NULL PRIMARY KEY,
+	name TEXT NOT NULL UNIQUE
+);
+
+CREATE TABLE cities (
+	id SERIAL NOT NULL PRIMARY KEY,
+	name TEXT NOT NULL UNIQUE,
+	"stateId" INTEGER NOT NULL REFERENCES states(id)
+);
+
+CREATE TABLE "customerAddresses" (
+	id SERIAL NOT NULL PRIMARY KEY,
+	"userId" INTEGER NOT NULL UNIQUE REFERENCES users(id),
+	street TEXT NOT NULL,
+	number INTEGER NOT NULL,
+	complement TEXT NOT NULL,
+	"postalCode" TEXT NOT NULL,
+	"cityId" INTEGER NOT NULL REFERENCES cities(id)
+);
+
+CREATE TABLE purchases (
+	id SERIAL NOT NULL PRIMARY KEY,
+	"productId" INTEGER NOT NULL REFERENCES products(id),
+	"userId" INTEGER NOT NULL REFERENCES users(id),
+	status TEXT NOT NULL DEFAULT 'criada',
+	"purchaseDate" TIMESTAMP NOT NULL DEFAULT NOW(),
+	"deliveryAddressId" INTEGER NOT NULL REFERENCES "customerAddresses"(id),
+	"chosenSizeId" INTEGER NOT NULL REFERENCES sizes(id)
+);
