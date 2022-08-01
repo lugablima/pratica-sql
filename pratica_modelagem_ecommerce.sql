@@ -19,7 +19,7 @@ CREATE TABLE categories (
 
 CREATE TABLE sizes (
 	id SERIAL NOT NULL PRIMARY KEY,
-	name TEXT NOT NULL UNIQUE,
+	name TEXT NOT NULL UNIQUE
 );
 
 CREATE TABLE products (
@@ -27,9 +27,9 @@ CREATE TABLE products (
 	name TEXT NOT NULL UNIQUE,
 	price INTEGER NOT NULL,
 	"mainPhotoId" INTEGER NOT NULL UNIQUE REFERENCES photos(id),
-	"photosId" tsvector NOT NULL UNIQUE REFERENCES photos(id),
+	"photosId" json NOT NULL UNIQUE REFERENCES photos(id),
 	"categoryId" INTEGER NOT NULL REFERENCES categories(id),
-	"sizesId" tsvector NOT NULL REFERENCES sizes(id)
+	"sizesId" json NOT NULL REFERENCES sizes(id)
 );
 
 CREATE TABLE states (
@@ -53,11 +53,13 @@ CREATE TABLE "customerAddresses" (
 	"cityId" INTEGER NOT NULL REFERENCES cities(id)
 );
 
+CREATE TYPE "statusType" AS ENUM ('criada', 'paga', 'entregue', 'cancelada');
+
 CREATE TABLE purchases (
 	id SERIAL NOT NULL PRIMARY KEY,
 	"productId" INTEGER NOT NULL REFERENCES products(id),
 	"userId" INTEGER NOT NULL REFERENCES users(id),
-	status TEXT NOT NULL DEFAULT 'criada',
+	status "statusType" NOT NULL DEFAULT 'criada',
 	"purchaseDate" TIMESTAMP NOT NULL DEFAULT NOW(),
 	"deliveryAddressId" INTEGER NOT NULL REFERENCES "customerAddresses"(id),
 	"chosenSizeId" INTEGER NOT NULL REFERENCES sizes(id)
